@@ -1,0 +1,5 @@
+---
+applications:
+ - name: C3PO-test
+   random-route: true
+   memory: 256M
