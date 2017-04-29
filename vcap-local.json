@@ -1,12 +1,56 @@
 {
- "services": {
-   "cloudantNoSQLDB": [
-     {
-       "credentials": {
-         "url":"https://ed3a815b-73d6-4dd0-8945-74c4723081eb-bluemix:0ae406c936f09b8f1d7ec9123fae5ebabaa647f4e5f0173eb8d328dfc3de4069@ed3a815b-73d6-4dd0-8945-74c4723081eb-bluemix.cloudant.com"
-       },
-       "label": "cloudantNoSQLDB"
-     }
-   ]
- }
+  "services": {
+    "cloudantNoSQLDB": [
+      {
+        "credentials": {
+          "url":"https://ed3a815b-73d6-4dd0-8945-74c4723081eb-bluemix:0ae406c936f09b8f1d7ec9123fae5ebabaa647f4e5f0173eb8d328dfc3de4069@ed3a815b-73d6-4dd0-8945-74c4723081eb-bluemix.cloudant.com"
+        },
+        "label": "cloudantNoSQLDB"
+      }
+    ],
+    "conversation": [
+      {
+        "credentials": {
+          "url": "https://gateway.watsonplatform.net/conversation/api",
+          "username": "138ba57a-ec6f-4b6b-8696-77d7c28b66b2",
+          "password": "8QYAcdCP8Ewp"
+        },
+        "label": "conversation",
+        "tags": [
+          "watson",
+          "ibm_created",
+          "ibm_dedicated_public"
+        ]
+      }
+    ],
+    "natural-language-understanding": [
+      {
+        "credentials": {
+          "url": "https://gateway.watsonplatform.net/natural-language-understanding/api",
+          "username": "9d93775b-38d1-4ef0-bf6c-450bf4e5e032",
+          "password": "0k5N0IHEtbpE"
+        },
+        "label": "natural-language-understanding",
+        "tags": [
+          "watson",
+          "ibm_created"
+        ]
+      }
+    ],
+    "tone_analyzer": [
+      {
+        "credentials": {
+          "url": "https://gateway.watsonplatform.net/tone-analyzer/api",
+          "username": "2d2a63ae-4b6e-43e2-b9de-cf922de55c71",
+          "password": "6Tv3PBrVIHUo"
+        },
+        "label": "tone_analyzer",
+        "tags": [
+          "watson",
+          "ibm_created",
+          "ibm_dedicated_public"
+        ]
+      }
+    ]
+  }
 }

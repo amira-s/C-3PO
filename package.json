@@ -8,7 +8,8 @@
     "node": "7.*"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node answer",
+    "start:watch": "nodemon answer"
   },
   "repository": {
     "type": "git",
@@ -19,8 +20,12 @@
     "cfenv": "^1.0.x",
     "cloudant": "^1.7.1",
     "dotenv": "^4.0.0",
-    "express": "^4.14.1"
+    "express": "^4.14.1",
+    "watson-developer-cloud": "^2.30.0"
   },
   "author": "IBM Corp",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
 }
