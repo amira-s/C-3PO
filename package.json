@@ -21,6 +21,8 @@
     "cloudant": "^1.7.1",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
+    "mongodb": "^2.2.26",
+    "uuid": "^3.0.1",
     "watson-developer-cloud": "^2.30.0"
   },
   "author": "IBM Corp",
