@@ -8,12 +8,8 @@
     "node": "7.*"
   },
   "scripts": {
-    "start": "node answer",
-    "start:watch": "nodemon answer"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/IBM-Bluemix/get-started-node"
+    "start": "babel-node answer",
+    "start:watch": "nodemon --exec 'babel-node' answer"
   },
   "dependencies": {
     "body-parser": "^1.16.1",
@@ -21,13 +17,34 @@
     "cloudant": "^1.7.1",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
-    "mongodb": "^2.2.26",
     "uuid": "^3.0.1",
+    "ioredis": "^2.5.0",
+    "json-stringify-deterministic": "^1.0.0",
+    "lodash": "^4.17.4",
+    "md5": "^2.2.1",
     "watson-developer-cloud": "^2.30.0"
   },
-  "author": "IBM Corp",
+  "author": "Syrine AMIRA corp",
   "license": "Apache-2.0",
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "ioredis-mock": "^2.4.0",
+    "jest": "^19.0.2",
     "nodemon": "^1.11.0"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ],
+    "plugins": [
+      [
+        "transform-object-rest-spread",
+        {
+          "useBuiltIns": true
+        }
+      ]
+    ]
   }
 }
