@@ -50,6 +50,14 @@ class Cache {
       });
     });
   }
+  /**
+   * Try to access cached value with arguments `args` in namespace `msgId`. If
+   * none exists, call `getResult` with `args`, cache the result in Redis
+   * database, and return the result.
+   * @param {string} msgId
+   * @param {T} args
+   * @param {(T) => string|Promise<string>} getResult
+   */
   access(msgId, args, getResult) {
     const key = hash(args);
 
@@ -69,6 +77,13 @@ class Cache {
           setAndResolveResult(result);
       });
   }
+  /**
+   * Like .access, but serialise JSON before storing it, and parse it before
+   * returning it.
+   * @param {string} msgId
+   * @param {*} args
+   * @param {(*) => object|Promise<object>} getResult
+   */
   accessJson(msgId, args, getResult) {
     const getResultStr = (...args) => {
       const result = getResult(...args);
@@ -79,9 +94,15 @@ class Cache {
     return this.access(msgId, args, getResultStr)
       .then(res => Promise.resolve(JSON.parse(res)));
   }
+  /**
+   * Remove all Redis entries associated with namespace `msgId`.
+   */
   clear(msgId) {
     return this.redis.del(msgId);
   }
+  /**
+   * Wipe all entries in Redis database.
+   */
   clearAll() {
     console.log('[cache] Flushing Redis cache...');
     return this.redis.flushall();
