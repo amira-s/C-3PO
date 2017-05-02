@@ -85,15 +85,11 @@ app.post("/api/v1/add-message", (req, res) => {
   console.log('----------------------------------------', new Date());
   console.log(req.body);
   let content = {
+    ...req.body,
     id_session: "amira_s" + req.body.id_session,
-    data: req.body.time,
-    group: req.body.group,
-    input: req.body.input,
-    output: req.body.output,
-    watson: req.body.watson
   }
 
-  watson.tone_analyzer(content.input)
+  watson.tone_analyzer(content.input.text)
     .then((response) => {
       console.log("tone_analyzer added");
       console.log(JSON.stringify(response, null, 2));
@@ -103,7 +99,7 @@ app.post("/api/v1/add-message", (req, res) => {
       console.log("Tone analyzer ===== ", err);
     })
     .then(() => {
-      return watson.nlu(content.input)
+      return watson.nlu(content.input.text)
         .then((response) => {
           console.log("natural language understanding added");
           console.log(JSON.stringify(response, null, 2));
@@ -116,7 +112,6 @@ app.post("/api/v1/add-message", (req, res) => {
     .then(() => {
       new Storage("cloudantNoSQLDB", "codecamp", (db) => {
         db.insert(content, (err, data) => {res.json({"res": "Ok"});});
-        res.send("data saved");
       });      
     });
 });

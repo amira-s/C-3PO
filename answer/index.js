@@ -23,7 +23,7 @@ app.use("/api", (req, res, next) => {
 *  User input in then treated and added to the db
 *  Send POST request to /api/v1/message with body 
 *  {
-*    "conversation_id" : "",
+*    "id_session" : "",
      "group" : "ETNA",
 *    "time" : timestamp,
 *    "input" : {

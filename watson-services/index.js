@@ -48,8 +48,8 @@ module.exports = {
 			version: 'v3',
 			version_date: '2016-05-19'
 		});
-		return new Promise((succes, reject) => {
-			tone.tone({text: msg, tones: "emotion", sentences: false}, function(err, tone) {	
+		return new Promise((success, reject) => {
+			tone.tone({text: msg, tones: "emotion"}, function(err, tone) {	
 			    if (err)
 			      reject(err);
 			    else {
@@ -86,7 +86,7 @@ module.exports = {
 		  }
 		}
 
-		return new Promise((success, reject) => {
+		return new Promise((resolve, reject) => {
 			natural_language_understanding.analyze(parameters, function(err, response) {
 			  if (err)
 				reject(err);			  
