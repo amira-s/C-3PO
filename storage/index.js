@@ -25,7 +25,7 @@ app.post("/api/v1/add-message", (req, res) => {
   res.send("data saved");
 });
 
-var port = process.env.PORT || 3000
+var port = process.env.PORT || 3001
 app.listen(port, function() {
     console.log("To view your app, open this link in your browser: http://localhost:" + port);
 });
