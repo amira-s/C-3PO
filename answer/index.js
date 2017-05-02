@@ -2,17 +2,10 @@ const path = require("path");
 const express = require("express");
 const app = express();
 const bodyParser = require('body-parser')
-// var storage = require('./storage');
 const watson = require('../watson-services');
 const isAuthenticated = (req) => true; //req.body.password === 'pass';
 
-// var store = new Storage("cloudantNoSQLDB", "mydb");
-
-
-// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
-
-// parse application/json
 app.use(bodyParser.json())
 
 app.use("/api", (req, res, next) => {
@@ -52,7 +45,11 @@ app.post("/api/v1/message", (req, res) => {
       res.send("Watson isn't responding.");
     })
     .then(() => {
+      console.log("NLU => \n");
       watson.nlu(req.body.input.text);
+      console.log("TONE => \n");
+      watson.tone_analyzer(req.body.input.text);
+      console.log("TEST => ");
       watson.tone_analyzer(req.body.input.text);
     });
 });

@@ -49,7 +49,7 @@ module.exports = {
 			version_date: '2016-05-19'
 		});
 		
-		tone.tone({text: msg}, function(err, tone) {	
+		tone.tone({text: msg, tones: "emotion", sentences: false}, function(err, tone) {	
 		    if (err)
 		      console.log(err);
 		    else
