@@ -6,7 +6,6 @@ let cache;
 beforeAll(() => cacheFactory()
     .then(c => {
       cache = c;
-      return Promise.resolve();
     })
 );
 

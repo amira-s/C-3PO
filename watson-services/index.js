@@ -48,12 +48,14 @@ module.exports = {
 			version: 'v3',
 			version_date: '2016-05-19'
 		});
-		
-		tone.tone({text: msg, tones: "emotion", sentences: false}, function(err, tone) {	
-		    if (err)
-		      console.log(err);
-		    else
-		      console.log(JSON.stringify(tone, null, 2));
+		return new Promise((succes, reject) => {
+			tone.tone({text: msg, tones: "emotion", sentences: false}, function(err, tone) {	
+			    if (err)
+			      reject(err);
+			    else {
+			      success(tone);
+				}
+			});
 		});
 	},
 	//data is a string of text to analyze = user's input.
@@ -74,22 +76,25 @@ module.exports = {
 		    'entities': {
 		      'emotion': true,
 		      'sentiment': true,
-		      'limit': 2
+		      'limit': 3
 		    },
 		    'keywords': {
 		      'emotion': true,
 		      'sentiment': true,
-		      'limit': 2
+		      'limit': 3
 		    }
 		  }
 		}
 
-		natural_language_understanding.analyze(parameters, function(err, response) {
-		  if (err)
-		    console.log('error:', err);
-		  
-		  else
-		    console.log(JSON.stringify(response, null, 2));
+		return new Promise((success, reject) => {
+			natural_language_understanding.analyze(parameters, function(err, response) {
+			  if (err)
+				reject(err);			  
+			  else
+			  {
+			    resolve(response);
+			  }
+			});
 		});
 	}
 }

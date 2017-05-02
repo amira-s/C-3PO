@@ -1,7 +1,8 @@
-var express = require("express");
-var app = express();
-var bodyParser = require('body-parser');
-var Storage = require('./Storage.js');
+const express = require("express");
+const app = express();
+const bodyParser = require('body-parser');
+const watson = require('../watson-services');
+const Storage = require('./Storage.js');
 const uuidV4 = require('uuid/v4');
 
 var isAuthenticated = (req, callback) => {
@@ -50,13 +51,78 @@ var tokenRequired = (req, res, next) => {
   });
 };
 
+/* ************* COMMON DB ******************
+*
+*
+*    req.body {
+*        conversation_id : (string),
+*        time : (timeStamp),
+*        group: (string),
+*        input: { 
+*            type : "text",
+*            text : (string)  },
+*        output: {
+*             type: "text"
+*            text : (string)  },
+*         watson: [{conversation}, ]
+*    }
+*
+*    @content {
+*      "id_session": (string "chef_token"),
+*      "date": (timestamp),
+*      "group": (string),
+*      "input": {
+*          "type": (string 'text', 'img', ...),
+*          "data": (string)
+*          },
+*      "output": {
+*          "type": (string 'text', 'img', ...),
+*          "data": (string)
+*          },
+*      "watson": [{}, {}]
+*  }
+*/
 app.post("/api/v1/add-message", (req, res) => {
   console.log('----------------------------------------', new Date());
-  console.log("text :", req.body.input.text);
-  //todo send data to module and display response
-  res.send("data saved");
+  console.log(req.body);
+  let content = {
+    id_session: "amira_s" + req.body.id_session,
+    data: req.body.time,
+    group: req.body.group,
+    input: req.body.input,
+    output: req.body.output,
+    watson: req.body.watson
+  }
+
+  watson.tone_analyzer(content.input)
+    .then((response) => {
+      console.log("tone_analyzer added");
+      console.log(JSON.stringify(response, null, 2));
+      content.watson.push(response);
+    })
+    .catch((err) => {
+      console.log("Tone analyzer ===== ", err);
+    })
+    .then(() => {
+      return watson.nlu(content.input)
+        .then((response) => {
+          console.log("natural language understanding added");
+          console.log(JSON.stringify(response, null, 2));
+          content.watson.push(response);
+        })
+        .catch((err) => {
+          console.log("NLU ===== ", err);
+        });
+    })
+    .then(() => {
+      new Storage("cloudantNoSQLDB", "codecamp", (db) => {
+        db.insert(content, (err, data) => {res.json({"res": "Ok"});});
+        res.send("data saved");
+      });      
+    });
 });
 
+/************ BACKOFFICE DB **********************/
 app.post("/api/v1/register", (req, res) => {
   let username = req.body.username;
   let password = req.body.password;
@@ -139,5 +205,5 @@ app.delete("/api/v1/org/:id", (req, res) => {
 
 var port = process.env.PORT || 3001
 app.listen(port, function() {
-  console.log("To view your app, open this link in your browser: http://localhost:" + port);
+    console.log("Listening on:  http://localhost:" + port);
 });
