@@ -120,12 +120,13 @@ app.post("/api/v1/add-message", (req, res) => {
 app.post("/api/v1/register", (req, res) => {
   let username = req.body.username;
   let password = req.body.password;
+  let email = req.body.email
   new Storage("cloudantNoSQLDB", "user", (db) => {
     db.find({selector:{username}}, (er, result) => {
       if (result.docs.length > 0)
         res.json({"error": "User already exist"});
       else 
-        db.insert({username, password}, (err, data) => {res.json({"res": "Ok"});});
+        db.insert({username, password, email}, (err, data) => {res.json({"res": "Ok"});});
     });
   });
 });
