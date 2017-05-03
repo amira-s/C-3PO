@@ -5,6 +5,7 @@ const app = express();
 const bodyParser = require('body-parser')
 const watson = require('../watson-services');
 const isAuthenticated = (req) => true; //req.body.password === 'pass';
+const log = require('../utils/log');
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -35,11 +36,11 @@ app.use("/api", (req, res, next) => {
 */
 
 app.post("/api/v1/message", (req, res) => {
-  console.log('----------------------------------------', new Date());
-  console.log("text :", req.body.input.text);
+  log('----------------------------------------', new Date());
+  log("text :", req.body.input.text);
   watson.conversation({input: {text: req.body.input.text}, context: req.body.context})
     .then((response) => {
-      console.log("watson : ", response.output.text);
+      log("watson : ", response.output.text);
       res.send(JSON.stringify(response));
       return Promise.resolve(response);
     })
@@ -56,7 +57,7 @@ app.post("/api/v1/message", (req, res) => {
       };
       data.watson.push(response);
 
-      console.log("DATA FOR POST REQUEST TO STORAGE", data);
+      log("DATA FOR POST REQUEST TO STORAGE", data);
       
       fetch('http://localhost:3001/api/v1/add-message', { 
           method: 'POST', 
@@ -66,7 +67,7 @@ app.post("/api/v1/message", (req, res) => {
         .then(function(res) {
             return res.json();
         }).then(function(json) {
-            console.log(json);
+          log('[/api/v1/message] /api/v1/add-message return:', json);
         });
       
     });
@@ -75,7 +76,7 @@ app.post("/api/v1/message", (req, res) => {
 app.use(express.static(path.resolve(__dirname, '../views')));
 
 
-var port = process.env.PORT || 3000
+const port = process.env.PORT || 3000
 app.listen(port, function() {
-    console.log("To view your app, open this link in your browser: http://localhost:" + port);
+    console.log(`[answer] Server started at http://localhost:${port}`);
 });

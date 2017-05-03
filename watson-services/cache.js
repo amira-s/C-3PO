@@ -12,11 +12,16 @@ function stringify(o) {
 }
 
 class Cache {
-  constructor() {
+  constructor({ verbose } = {}) {
+    this.verbose = verbose;
+
     this.access = this.access.bind(this);
     this.accessJson = this.accessJson.bind(this);
     this.clear = this.clear.bind(this);
     this.clearAll = this.clearAll.bind(this);
+    this.log = this.verbose ?
+      function log(...args) { console.log('[cache] ', ...args) } :
+      ()=>{};
   }
   init() {
     return new Promise((resolve, reject) => {
@@ -66,11 +71,15 @@ class Cache {
         .then(() => Promise.resolve(result.toString()));
     }
 
+    console.log(key);
+
     return this.redis.hget(msgId, key)
       .then((cached) => {
         if (cached !== null) {
+          this.log(`Cache hit (${cached}).`);
           return Promise.resolve(cached);
         }
+        this.log(`Cache miss.`);
         const result = getResult(args);
         return (result instanceof Promise) ?
           result.then(setAndResolveResult) :
@@ -110,6 +119,6 @@ class Cache {
 }
 
 module.exports = (...args) => {
-  const cache = new Cache();
-  return cache.init(...args);
+  const cache = new Cache(...args);
+  return cache.init();
 };

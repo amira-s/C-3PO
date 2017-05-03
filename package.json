@@ -8,17 +8,19 @@
     "node": "7.*"
   },
   "scripts": {
-    "answer": "babel-node answer",
-    "answer:watch": "nodemon --exec 'babel-node' answer",
+    "answer": "cross-env DEBUG=true babel-node answer",
+    "answer:watch": "cross-env DEBUG=true nodemon --exec 'babel-node' answer",
     "test": "jest",
     "test:watch": "jest --watch",
-    "storage:watch": "nodemon --exec 'babel-node' storage"
+    "storage:watch": "cross-env DEBUG=true nodemon --exec 'babel-node' storage"
   },
   "dependencies": {
     "body-parser": "^1.16.1",
     "cfenv": "^1.0.x",
     "cloudant": "^1.7.1",
+    "cross-env": "^4.0.0",
     "dotenv": "^4.0.0",
+    "es6-promisify": "^5.0.0",
     "express": "^4.14.1",
     "ioredis": "^2.5.0",
     "json-stringify-deterministic": "^1.0.0",
