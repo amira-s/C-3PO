@@ -1,6 +1,4 @@
 var cfenv = require("cfenv");
-
-// load local VCAP configuration  and service credentials
 var vcapLocal;
 try {
   vcapLocal = require('../vcap-local.json');
@@ -29,9 +27,23 @@ module.exports = class Storage {
       }
     }
 
-  // content { "data" : data }
+  /* @content {
+  *      "id_session": (string "chef_token"),
+  *      "date": (timestamp),
+  *      "group": (string),
+  *      "input": {
+  *          "type": (string 'text', 'img', ...),
+  *          "data": (string)
+  *          },
+  *      "output": {
+  *          "type": (string 'text', 'img', ...),
+  *          "data": (string)
+  *          },
+  *      "watson": [{}, {}]
+  *  }
+  */
   insert(content) {
-    this.mydb.insert(content, function(err, body, header) {
+    this.mydb.insert({ crazy: true }, 'rabbit', function(err, body, header) {
       if (err) {
         return console.log('[mydb.insert] ', err.message);
       }
