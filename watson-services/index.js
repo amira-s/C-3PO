@@ -1,7 +1,10 @@
 const watson = require('watson-developer-cloud');
 const cfenv = require("cfenv");
 const log = require('../utils/log');
-const { memoizeCallbackStyle: memoize } = require('./memoize');
+const {
+  memoizeCallbackStyle: memoize,
+  clear
+} = require('../utils/memoize');
 
 // load local VCAP configuration  and service credentials
 let vcapLocal;
@@ -49,13 +52,13 @@ const natural_language_understanding_analyze = memoize((() => {
 
 module.exports = {
   //msg => string representing user's message
-  conversation : function conversation(msg) {
+  conversation : function conversation(msg, msgId) {
     const parameters = {
       workspace_id: '31790861-0e9b-4203-a717-40377000742e',
       context: msg.context || {},
       input: msg.input || {}
     };
-    return conversation_message('DUMMY_MSG_ID', parameters)
+    return conversation_message(msgId, parameters)
       .then(res => {
           log('[conversation]: ', JSON.stringify(res, null, 2));
           return Promise.resolve(res);
@@ -63,12 +66,12 @@ module.exports = {
   },
 
   //msg => string representing user's message
-  tone_analyzer : function tone_analyzer(msg) {
+  tone_analyzer : function tone_analyzer(msg, msgId) {
     const parameters = {
       text: msg,
       tones: "emotion",
     };
-    return tone_analyzer_tone('DUMMY_MSG_ID', parameters)
+    return tone_analyzer_tone(msgId, parameters)
       .then(res => {
         log('[tone_analyzer]: ', JSON.stringify(res, null, 2));
         return Promise.resolve(res);
@@ -78,7 +81,7 @@ module.exports = {
   //data is a string of text to analyze = user's input.
   //maybe accept parameters as a function parameter later
   //or just the limits number
-  nlu : function nlu(data) {
+  nlu : function nlu(data, msgId) {
     const parameters = {
       'text': data,
       'features': {
@@ -94,10 +97,13 @@ module.exports = {
         }
       }
     }
-    return natural_language_understanding_analyze('DUMMY_MSG_ID', parameters)
+    return natural_language_understanding_analyze(msgId, parameters)
       .then(res => {
         log('[natural_language_understanding]: ', JSON.stringify(res, null, 2));
         return Promise.resolve(res);
       });
+  },
+  lastCall: function lastCall(msgId) {
+    return clear(msgId);
   }
 }

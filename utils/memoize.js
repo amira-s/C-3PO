@@ -5,14 +5,14 @@ let cache = null;
 cacheFactory({ verbose: !!process.env.DEBUG }).then((c) => { cache = c; });
 
 function memoize(remoteApi) {
-  return function memoized(msgId, ...args) {
+  return function memoized(namespace, ...args) {
     const apply = (args) => remoteApi(...args);
     if (!cache) {
       console.error('[memoize] Cache not initialized (yet), bypassing...');
       return apply(args);
     }
     return cache.accessJson(
-      msgId,
+      namespace,
       args,
       apply,
     );
@@ -21,7 +21,12 @@ function memoize(remoteApi) {
 
 const memoizeCallbackStyle = (service) => memoize(promisify(service));
 
+function clear(namespace) {
+  return cache.clear(namespace);
+}
+
 module.exports = {
   memoize,
   memoizeCallbackStyle,
+  clear,
 };

@@ -5,6 +5,7 @@ const app = express();
 const bodyParser = require('body-parser')
 const watson = require('../watson-services');
 const isAuthenticated = (req) => true; //req.body.password === 'pass';
+const uuid = require('uuid/v4');
 const log = require('../utils/log');
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -36,9 +37,13 @@ app.use("/api", (req, res, next) => {
 */
 
 app.post("/api/v1/message", (req, res) => {
-  log('----------------------------------------', new Date());
+  const messageId = uuid();
+  console.log(
+    '------------',
+    `message ID: [${messageId}]`,
+    'time: [', new Date(), ']');
   log("text :", req.body.input.text);
-  watson.conversation({input: {text: req.body.input.text}, context: req.body.context})
+  watson.conversation({input: {text: req.body.input.text}, context: req.body.context}, messageId)
     .then((response) => {
       log("watson : ", response.output.text);
       res.send(JSON.stringify(response));
@@ -51,7 +56,7 @@ app.post("/api/v1/message", (req, res) => {
     .then((response) => {
       delete req.body.context;
       let data = {
-        ...req.body, 
+        ...req.body,
         output: {type: "text", text: response.output.text},
         watson: []
       };
@@ -62,7 +67,10 @@ app.post("/api/v1/message", (req, res) => {
       fetch('http://localhost:3001/api/v1/add-message', { 
           method: 'POST', 
           headers: {'Content-Type': "application/json"},
-          body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          message_id: messageId,
+        }),
         })
         .then(function(res) {
             return res.json();
