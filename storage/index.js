@@ -96,6 +96,17 @@ app.post("/api/v1/token", (req, res) => {
 });
 
 app.use("/api/v1/org*", tokenRequired);
+app.use("/api/v1/usr*", tokenRequired);
+
+app.get("/api/v1/usr", (req, res) => {
+  new Storage("cloudantNoSQLDB", "user", (db) => {
+    getUserId(req, (str) => {
+      db.find({selector:{_id: str}}, (er, result) => {
+        res.json(result);
+      });
+    });
+  });
+});
 
 app.get("/api/v1/org", (req, res) => {
   new Storage("cloudantNoSQLDB", "org", (db) => {
