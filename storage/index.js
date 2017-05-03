@@ -159,6 +159,7 @@ app.post("/api/v1/token", (req, res) => {
 
 app.use("/api/v1/org*", tokenRequired);
 app.use("/api/v1/usr*", tokenRequired);
+app.use("/api/v1/token*", tokenRequired);
 
 app.get("/api/v1/usr", (req, res) => {
   new Storage("cloudantNoSQLDB", "user", (db) => {
@@ -182,9 +183,12 @@ app.get("/api/v1/org", (req, res) => {
 
 app.post("/api/v1/org", (req, res) => {
   let name = req.body.name;
+  let img = req.body.img
+  let adminToken = uuidV4();
+  let clientToken = uuidV4();
   new Storage("cloudantNoSQLDB", "org", (db) => {
     getUserId(req, (str) => {
-      db.insert({name, owner: str}, (err, data) => {
+      db.insert({clientToken, adminToken, name, img, owner: str}, (err, data) => {
         res.json({"res": "Ok"});
       });
     });
@@ -201,12 +205,12 @@ app.get("/api/v1/org/:id", (req, res) => {
   });
 });
 
-app.put("/api/v1/org/:id", (req, res) => {
-
+app.post("/api/v1/token/admin", (req, res) => {
+  //TODO
 });
 
-app.delete("/api/v1/org/:id", (req, res) => {
-
+app.post("/api/v1/token", (req, res) => {
+  //TODO
 });
 
 var port = process.env.PORT || 3001
