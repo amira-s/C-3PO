@@ -1,9 +1,13 @@
-var cfenv = require("cfenv");
-var vcapLocal;
+const cfenv = require("cfenv");
+const log = require('../utils/log');
+
+let vcapLocal;
 try {
   vcapLocal = require('../vcap-local.json');
-  console.log("storage : Loaded local VCAP", vcapLocal);
-} catch (e) { }
+  log("[storage]: Loaded local VCAP", vcapLocal);
+} catch (e) {
+  log("[storage]: Couldn't load local VCAP");
+}
 
 const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
 const appEnv = cfenv.getAppEnv(appEnvOpts);
