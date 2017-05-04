@@ -1,10 +1,10 @@
 const express = require("express");
 const app = express();
 const bodyParser = require('body-parser');
-const watson = require('../watson-services');
-const Storage = require('./Storage.js');
 const uuid = require('uuid/v4');
 const log = require('../utils/log');
+
+const addMessageListener = require('./add-message')();
 
 var isAuthenticated = (req, callback) => {
   var token = req.get("Authorization");
@@ -82,45 +82,6 @@ var tokenRequired = (req, res, next) => {
 *      "watson": [{}, {}]
 *  }
 */
-app.post("/api/v1/add-message", (req, res) => {
-  console.log( '------------', 'time: [', new Date(), ']');
-  log('[/api/v1/add-message] body: ', req.body);
-
-  const messageId = req.body.message_id;
-
-  let content = {
-    ...req.body,
-    id_session: "amira_s" + req.body.id_session,
-  };
-  delete content.message_id;
-
-  watson.tone_analyzer(content.input.text, messageId)
-  .then((response) => {
-    console.log("natural language understanding added");
-    console.log(JSON.stringify(response, null, 2));
-    content.watson.push(response);
-  })
-  .catch((err) => {
-    console.log("Tone analyzer ====== ", err);
-  })
-  .then(() => {
-    return watson.nlu(content.input.text, messageId)
-    .then((response) => {
-      console.log("natural language understanding added");
-      console.log(JSON.stringify(response, null, 2));
-      content.watson.push(response);
-    })
-    .catch((err) => {
-      console.log("NLU ====== ", err);
-    });
-  })
-  .then(() => {
-    watson.lastCall(messageId);
-    new Storage("cloudantNoSQLDB", "codecamp", (db) => {
-      db.insert(content, content.id_session, (err, data) => {res.json({"res": "Ok"});});
-    });
-  });
-});
 
 /************ BACKOFFICE DB **********************/
 app.post("/api/v1/register", (req, res) => {
@@ -303,5 +264,5 @@ app.get("/api/v1/stats", (req, res) => {
 
 var port = process.env.PORT || 3001
 app.listen(port, function() {
-  console.log("Listening on:  http://localhost:" + port);
+  console.log(`[storage] Server listening at http://localhost:${port}`);
 });
