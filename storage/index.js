@@ -211,7 +211,6 @@ app.get("/api/v1/org/:id", (req, res) => {
 });
 
 app.post("/api/v1/conv", (req, res) => {
-  //Unsafe AF
   let clientToken = req.body.clientToken;
   let convId = req.body.convId;
   let date = req.body.date;
@@ -223,7 +222,6 @@ app.post("/api/v1/conv", (req, res) => {
 });
 
 app.get("/api/v1/conv/:token", (req, res) => {
-  //Unsafe AF
   let clientToken = req.params.token;
   new Storage("cloudantNoSQLDB", "conv", (db) => {
     db.find({selector:{clientToken}}, (er, result) => {
