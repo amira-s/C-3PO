@@ -1,5 +1,5 @@
 const throttle = require('lodash/throttle');
-const Redis = require('ioredis');
+const Redis = process.env.MICROSERVICES ? require('ioredis') : require('ioredis-mock').default;
 const md5 = require('md5');
 const jsonStringify = require('json-stringify-deterministic');
 
