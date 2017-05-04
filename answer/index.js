@@ -2,6 +2,7 @@ const path = require("path");
 const express = require("express");
 const fetch = require("node-fetch"); 
 const app = express();
+const sendToStorage = require('./send-to-storage');
 const bodyParser = require('body-parser')
 const watson = require('../watson-services');
 const isAuthenticated = (req) => true; //req.body.password === 'pass';
@@ -36,34 +37,6 @@ app.use("/api", (req, res, next) => {
 *    "context": object
 *  }
 */
-
-function sendToStorage({ message, response = { output: {}} } = {}) {
-  const data = {
-    ...message,
-    watson: [response],
-    output: { type: "text", text: response.output.text },
-  };
-
-  fetch('http://localhost:3001/api/v1/add-message',
-    {
-      method: 'POST',
-      headers: {'Content-Type': "application/json"},
-      body: JSON.stringify(data),
-    })
-    .then((res) => res.json())
-    .then((json) => {
-      log('[sendToStorage] /api/v1/add-message return:', json);
-      return Promise.resolve(json);
-    })
-    .catch(err => {
-      if (err.code === 'ECONNREFUSED') {
-        log(`[sendToStorage] Can't connect to storage API. Is server started ?`,
-          `"${err.message.replace(/^(.*), reason: /, '')}"`);
-      } else {
-        console.error('[sendToStorage] /api/v1/add-message failed:', err);
-      }
-    });
-}
 
 app.post("/api/v1/message", (req, res) => {
   const messageId = uuid();
