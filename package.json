@@ -9,10 +9,10 @@
   },
   "scripts": {
     "answer": "cross-env DEBUG=true babel-node answer",
-    "answer:watch": "cross-env DEBUG=true nodemon --exec 'babel-node' answer",
+    "answer:watch": "cross-env DEBUG=true PORT=3000 nodemon --exec 'babel-node' answer",
     "test": "jest",
     "test:watch": "jest --watch",
-    "storage:watch": "cross-env DEBUG=true nodemon --exec 'babel-node' storage",
+    "storage:watch": "cross-env DEBUG=true PORT=3001 nodemon --exec 'babel-node' storage",
     "rabbitmq": "sudo rabbitmq-server",
     "rabbitmq:stop": "sudo rabbitmqctl stop",
     "reddis": "./binaries/redis-server"
