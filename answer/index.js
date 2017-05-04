@@ -30,7 +30,7 @@ app.use("/api", (req, res, next) => {
 *    "time" : timestamp,
 *    "input" : {
 *      "type" : "text",
-*      "content" : "Hi !"
+*      "text" : "Hi !"
 *    },
 *    "context": object
 *  }
