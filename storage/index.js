@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v4');
 const log = require('../utils/log');
+const Storage = require('./Storage');
 
 const addMessageListener = require('./add-message')();
 
@@ -36,6 +37,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
+  console.log("----------------------REQ---");
+  console.log(req.body);
+  console.log("--------------------------");
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   next();
@@ -50,6 +54,7 @@ var tokenRequired = (req, res, next) => {
     next();
   });
 };
+
 
 /* ************* COMMON DB ******************
 *
