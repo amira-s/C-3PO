@@ -51,11 +51,16 @@ const consumeFromQueue = (queueName, callback) => {
     return callback(processed);
   }
   return channel
-    .then(ch => ch.consume(queueName, consume, { noAck: true }));
+    .then(ch => {
+      ch.assertQueue(queueName, {
+        durable: false, /* Delete queue on broker shutdown */
+      });
+      return ch.consume(queueName, consume, { noAck: true });
+    });
 };
 
 module.exports = {
   connectToBroker,
   sendToQueue,
   consumeFromQueue,
-};
+}; 
