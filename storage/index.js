@@ -111,7 +111,12 @@ app.post("/api/v1/add-message", (req, res) => {
     })
     .then(() => {
       new Storage("cloudantNoSQLDB", "codecamp", (db) => {
-        db.insert(content, content.id_session, (err, data) => {res.json({"res": "Ok"});});
+        db.insert(content, (err, data) => {
+          if (err)
+            console.log("ERRR", err);
+          if (data)
+            console.log("DATA", data);
+          res.json({"res": "Ok"});});
       });      
     });
 });
