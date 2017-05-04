@@ -1,18 +1,16 @@
 const path = require("path");
 const express = require("express");
-const fetch = require("node-fetch"); 
 const app = express();
+const sendToStorage = require('./send-to-storage');
 const bodyParser = require('body-parser')
 const watson = require('../watson-services');
 const isAuthenticated = (req) => true; //req.body.password === 'pass';
+const uuid = require('uuid/v4');
+const log = require('../utils/log');
+const omit = require('lodash/omit');
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-
-app.use((req, res, next) => {
-  console.log('REQUEST:', req)
-  next();
-})
 
 app.use("/api", (req, res, next) => {
   if (!isAuthenticated(req)) {
@@ -40,11 +38,15 @@ app.use("/api", (req, res, next) => {
 */
 
 app.post("/api/v1/message", (req, res) => {
-  console.log('----------------------------------------', new Date());
-  console.log("text :", req.body.input.text);
-  watson.conversation({input: {text: req.body.input.text}, context: req.body.context})
+  const messageId = uuid();
+  console.log(
+    '------------',
+    `message ID: [${messageId}]`,
+    'time: [', new Date(), ']');
+  log("text :", req.body.input.text);
+  watson.conversation({input: {text: req.body.input.text}, context: req.body.context}, messageId)
     .then((response) => {
-      console.log("watson : ", response.output.text);
+      log("watson : ", response.output.text);
       res.send(JSON.stringify(response));
       return Promise.resolve(response);
     })
@@ -53,34 +55,18 @@ app.post("/api/v1/message", (req, res) => {
       res.send("Watson isn't responding.");
     })
     .then((response) => {
-      delete req.body.context;
-      let data = {
-        ...req.body, 
-        output: {type: "text", text: response.output.text},
-        watson: []
+      const message = {
+        ...omit(req.body, 'context'),
+        message_id: messageId,
       };
-      data.watson.push(response);
-
-      console.log("DATA FOR POST REQUEST TO STORAGE", data);
-      
-      fetch('http://localhost:3001/api/v1/add-message', { 
-          method: 'POST', 
-          headers: {'Content-Type': "application/json"},
-          body: JSON.stringify(data),
-        })
-        .then(function(res) {
-            return res.json();
-        }).then(function(json) {
-            console.log(json);
-        });
-      
+      return sendToStorage({ message, response });
     });
 });
 
 app.use(express.static(path.resolve(__dirname, '../views')));
 
 
-var port = process.env.PORT || 3000
+const port = process.env.PORT || 3000
 app.listen(port, function() {
-    console.log("To view your app, open this link in your browser: http://localhost:" + port);
+  console.log(`[answer] Server started at http://localhost:${port}`);
 });
