@@ -90,30 +90,30 @@ app.post("/api/v1/add-message", (req, res) => {
   }
 
   watson.tone_analyzer(content.input.text)
+  .then((response) => {
+    console.log("tone_analyzer added");
+    console.log(JSON.stringify(response, null, 2));
+    content.watson.push(response);
+  })
+  .catch((err) => {
+    console.log("Tone analyzer ===== ", err);
+  })
+  .then(() => {
+    return watson.nlu(content.input.text)
     .then((response) => {
-      console.log("tone_analyzer added");
+      console.log("natural language understanding added");
       console.log(JSON.stringify(response, null, 2));
       content.watson.push(response);
     })
     .catch((err) => {
-      console.log("Tone analyzer ===== ", err);
-    })
-    .then(() => {
-      return watson.nlu(content.input.text)
-        .then((response) => {
-          console.log("natural language understanding added");
-          console.log(JSON.stringify(response, null, 2));
-          content.watson.push(response);
-        })
-        .catch((err) => {
-          console.log("NLU ===== ", err);
-        });
-    })
-    .then(() => {
-      new Storage("cloudantNoSQLDB", "codecamp", (db) => {
-        db.insert(content, (err, data) => {res.json({"res": "Ok"});});
-      });      
+      console.log("NLU ===== ", err);
     });
+  })
+  .then(() => {
+    new Storage("cloudantNoSQLDB", "codecamp", (db) => {
+      db.insert(content, (err, data) => {res.json({"res": "Ok"});});
+    });      
+  });
 });
 
 /************ BACKOFFICE DB **********************/
@@ -159,7 +159,7 @@ app.post("/api/v1/token", (req, res) => {
 
 app.use("/api/v1/org*", tokenRequired);
 app.use("/api/v1/usr*", tokenRequired);
-app.use("/api/v1/token*", tokenRequired);
+app.use("/api/v1/token/admin", tokenRequired);
 
 app.get("/api/v1/usr", (req, res) => {
   new Storage("cloudantNoSQLDB", "user", (db) => {
@@ -209,11 +209,25 @@ app.post("/api/v1/token/admin", (req, res) => {
   //TODO
 });
 
-app.post("/api/v1/token", (req, res) => {
-  //TODO
+app.get("/api/v1/token/:org", (req, res) => {
+  let orgName = req.params.org;
+  new Storage("cloudantNoSQLDB", "org", (db) => {
+    db.find({selector:{name: orgName}}, (er, result) => {
+      if (result.docs.length <= 0)
+        res.json({"error": "Org unknown"});
+      else {
+        new Storage("cloudantNoSQLDB", "client", (db) => {
+          let token = uuidV4();
+          db.insert({orgName: result.docs[0].name, clientToken: token}, (err, data) => {
+            res.json({token});
+          });
+        });
+      }
+    });
+  });
 });
 
 var port = process.env.PORT || 3001
 app.listen(port, function() {
-    console.log("Listening on:  http://localhost:" + port);
+  console.log("Listening on:  http://localhost:" + port);
 });
