@@ -64,18 +64,28 @@ app.post("/api/v1/message", (req, res) => {
 
       log("DATA FOR POST REQUEST TO STORAGE", data);
 
-      fetch('http://localhost:3001/api/v1/add-message', { 
+      fetch('http://localhost:3001/api/v1/add-message',
+        {
           method: 'POST',
           headers: {'Content-Type': "application/json"},
-        body: JSON.stringify({
-          ...data,
-          message_id: messageId,
-        }),
+          body: JSON.stringify({
+            ...data,
+            message_id: messageId,
+          }),
         })
-        .then(function(res) {
-            return res.json();
-        }).then(function(json) {
+        .then((res) => {
+          return res.json();
+        }).then((json) => {
           log('[/api/v1/message] /api/v1/add-message return:', json);
+        })
+        .catch(err => {
+          if (err.code === 'ECONNREFUSED') {
+            log(`[/api/v1/message] Can't connect to storage API. Is server started ?`,
+              `"${err.message.replace(/^(.*), reason: /, '')}"`);
+          } else {
+            console.error('[/api/v1/message] /api/v1/add-message failed:', err);
+          }
+
         });
     });
 });
@@ -85,5 +95,5 @@ app.use(express.static(path.resolve(__dirname, '../views')));
 
 const port = process.env.PORT || 3000
 app.listen(port, function() {
-    console.log(`[answer] Server started at http://localhost:${port}`);
+  console.log(`[answer] Server started at http://localhost:${port}`);
 });
