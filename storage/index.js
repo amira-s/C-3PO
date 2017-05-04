@@ -245,7 +245,7 @@ app.get("/api/v1/token/:org", (req, res) => {
         new Storage("cloudantNoSQLDB", "client", (db) => {
           let token = uuidV4();
           db.insert({orgName: result.docs[0].name, clientToken: token}, (err, data) => {
-            res.json({token});
+            res.json({token: token});
           });
         });
       }
