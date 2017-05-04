@@ -73,15 +73,18 @@ module.exports = {
 		var parameters = {
 		  'text': data,
 		  'features': {
+		  	'categories': {},
+		  	'concepts': {limit: 3},
+		  	'categories': {},		  	
 		    'entities': {
 		      'emotion': true,
 		      'sentiment': true,
-		      'limit': 3
+		      'limit': 20
 		    },
 		    'keywords': {
 		      'emotion': true,
 		      'sentiment': true,
-		      'limit': 3
+		      'limit': 20
 		    }
 		  }
 		}

@@ -54,7 +54,7 @@ var tokenRequired = (req, res, next) => {
 *
 *
 *    req.body {
-*        conversation_id : (string),
+*        id_session : (string),
 *        time : (timeStamp),
 *        group: (string),
 *        input: { 
@@ -96,7 +96,7 @@ app.post("/api/v1/add-message", (req, res) => {
       content.watson.push(response);
     })
     .catch((err) => {
-      console.log("Tone analyzer ===== ", err);
+      console.log("Tone analyzer ====== ", err);
     })
     .then(() => {
       return watson.nlu(content.input.text)
@@ -106,12 +106,12 @@ app.post("/api/v1/add-message", (req, res) => {
           content.watson.push(response);
         })
         .catch((err) => {
-          console.log("NLU ===== ", err);
+          console.log("NLU ====== ", err);
         });
     })
     .then(() => {
       new Storage("cloudantNoSQLDB", "codecamp", (db) => {
-        db.insert(content, (err, data) => {res.json({"res": "Ok"});});
+        db.insert(content, content.id_session, (err, data) => {res.json({"res": "Ok"});});
       });      
     });
 });
