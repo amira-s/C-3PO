@@ -255,26 +255,26 @@ function capitalizeFirstLetter(string) {
 }
 
 var getData = (result) => {
- var words = {};
- var mood = 0;
- for (var i = result.docs.length - 1; i >= 0; i--) {
-  if (result.docs[i].watson[2] != undefined) {
-    for (var y = result.docs[i].watson[2].keywords.length - 1; y >= 0; y--) {
-      let wrd = capitalizeFirstLetter(String(result.docs[i].watson[2].keywords[y].text));
-      if (words[wrd] == undefined)
-        words[wrd] = 1;
-      else
-        words[wrd] += 1;
+  var words = {};
+  var mood = 0;
+  for (var i = result.docs.length - 1; i >= 0; i--) {
+    if (result.docs[i].watson[2] != undefined) {
+      for (var y = result.docs[i].watson[2].keywords.length - 1; y >= 0; y--) {
+        let wrd = capitalizeFirstLetter(String(result.docs[i].watson[2].keywords[y].text));
+        if (words[wrd] == undefined)
+          words[wrd] = 1;
+        else
+          words[wrd] += 1;
+      }
+    }
+    if (result.docs[i].watson[0].intents.length > 0) {
+      if (result.docs[i].watson[0].intents[0].intent == "good_mood")
+        mood = 1;
+      else if (result.docs[i].watson[0].intents[0].intent == "bad_mood")
+        mood = -1;
     }
   }
-  if (result.docs[i].watson[0].intents.length > 0) {
-    if (result.docs[i].watson[0].intents[0].intent == "good_mood")
-      mood = 1;
-    else if (result.docs[i].watson[0].intents[0].intent == "bad_mood")
-      mood = -1;
-  }
-}
-return {mood, words};
+  return {mood, words};
 }
 
 app.get("/api/v1/stats/user/:session", (req, res) => {
@@ -286,11 +286,10 @@ app.get("/api/v1/stats/user/:session", (req, res) => {
   });
 });
 
-app.get("/api/v1/stats/:org", (req, res) => {
-  //TODO
-  let id_session = req.params.org;
+app.get("/api/v1/stats/:orgName", (req, res) => {
+  let group = req.params.orgName;
   new Storage("cloudantNoSQLDB", "codecamp", (db) => {
-    db.find({selector:{id_session}}, (er, result) => {
+    db.find({selector:{group}}, (er, result) => {
       res.json(getData(result));
     });
   });
