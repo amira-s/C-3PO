@@ -95,31 +95,31 @@ app.post("/api/v1/add-message", (req, res) => {
   delete content.message_id;
 
   watson.tone_analyzer(content.input.text, messageId)
+  .then((response) => {
+    console.log("natural language understanding added");
+    console.log(JSON.stringify(response, null, 2));
+    content.watson.push(response);
+  })
+  .catch((err) => {
+    console.log("Tone analyzer ====== ", err);
+  })
+  .then(() => {
+    return watson.nlu(content.input.text, messageId)
     .then((response) => {
       console.log("natural language understanding added");
       console.log(JSON.stringify(response, null, 2));
       content.watson.push(response);
     })
     .catch((err) => {
-      console.log("Tone analyzer ====== ", err);
-    })
-    .then(() => {
-      return watson.nlu(content.input.text, messageId)
-        .then((response) => {
-          console.log("natural language understanding added");
-          console.log(JSON.stringify(response, null, 2));
-          content.watson.push(response);
-        })
-        .catch((err) => {
-          console.log("NLU ====== ", err);
-        });
-    })
-    .then(() => {
-      watson.lastCall(messageId);
-      new Storage("cloudantNoSQLDB", "codecamp", (db) => {
-        db.insert(content, content.id_session, (err, data) => {res.json({"res": "Ok"});});
-      });
+      console.log("NLU ====== ", err);
     });
+  })
+  .then(() => {
+    watson.lastCall(messageId);
+    new Storage("cloudantNoSQLDB", "codecamp", (db) => {
+      db.insert(content, content.id_session, (err, data) => {res.json({"res": "Ok"});});
+    });
+  });
 });
 
 /************ BACKOFFICE DB **********************/
@@ -235,6 +235,56 @@ app.get("/api/v1/token/:org", (req, res) => {
           });
         });
       }
+    });
+  });
+});
+
+var getData = (result) => {
+ var words = {};
+ var mood = 0;
+ for (var i = result.docs.length - 1; i >= 0; i--) {
+  if (result.docs[i].watson[2] != undefined) {
+    for (var y = result.docs[i].watson[2].keywords.length - 1; y >= 0; y--) {
+      let wrd = String(result.docs[i].watson[2].keywords[y].text);
+      if (words[wrd] == undefined)
+        words[wrd] = 1;
+      else
+        words[wrd] += 1;
+    }
+  }
+  if (result.docs[i].watson[0].intents.length > 0) {
+    if (result.docs[i].watson[0].intents[0].intent == "good_mood")
+      mood = 1;
+    else if (result.docs[i].watson[0].intents[0].intent == "bad_mood")
+      mood = -1;
+  }
+}
+return {mood, words};
+}
+
+app.get("/api/v1/stats/user/:session", (req, res) => {
+  let id_session = req.params.session;
+  new Storage("cloudantNoSQLDB", "codecamp", (db) => {
+    db.find({selector:{id_session}}, (er, result) => {
+      res.json(getData(result));
+    });
+  });
+});
+
+app.get("/api/v1/stats/:org", (req, res) => {
+  //TODO
+  let id_session = req.params.org;
+  new Storage("cloudantNoSQLDB", "codecamp", (db) => {
+    db.find({selector:{id_session}}, (er, result) => {
+      res.json(getData(result));
+    });
+  });
+});
+
+app.get("/api/v1/stats", (req, res) => {
+  new Storage("cloudantNoSQLDB", "codecamp", (db) => {
+    db.find({selector:{}}, (er, result) => {
+      res.json(getData(result));
     });
   });
 });
