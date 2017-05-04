@@ -191,7 +191,6 @@ app.post("/api/v1/token", (req, res) => {
 
 app.use("/api/v1/org*", tokenRequired);
 app.use("/api/v1/usr*", tokenRequired);
-app.use("/api/v1/token/admin", tokenRequired);
 
 app.get("/api/v1/usr", (req, res) => {
   new Storage("cloudantNoSQLDB", "user", (db) => {
@@ -237,8 +236,15 @@ app.get("/api/v1/org/:id", (req, res) => {
   });
 });
 
-app.post("/api/v1/token/admin", (req, res) => {
-  //TODO
+app.post("/api/v1/conv", (req, res) => {
+  //Unsafe AF
+  let clientToken = req.body.clientToken;
+  let convId = req.body.convId;
+  new Storage("cloudantNoSQLDB", "conv", (db) => {
+    db.insert({clientToken, convId}, (err, data) => {
+      res.json({"res": "Ok"});
+    });
+  });
 });
 
 app.get("/api/v1/token/:org", (req, res) => {
