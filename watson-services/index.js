@@ -60,7 +60,7 @@ module.exports = {
     };
     return conversation_message(msgId, parameters)
       .then(res => {
-          log('[conversation]: ', JSON.stringify(res, null, 2));
+          log('[conversation]: ', JSON.stringify(res));
           return Promise.resolve(res);
         });
   },
@@ -73,7 +73,7 @@ module.exports = {
     };
     return tone_analyzer_tone(msgId, parameters)
       .then(res => {
-        log('[tone_analyzer]: ', JSON.stringify(res, null, 2));
+        log('[tone_analyzer]: ', JSON.stringify(res));
         return Promise.resolve(res);
       });
   },
@@ -99,7 +99,7 @@ module.exports = {
     }
     return natural_language_understanding_analyze(msgId, parameters)
       .then(res => {
-        log('[natural_language_understanding]: ', JSON.stringify(res, null, 2));
+        log('[natural_language_understanding]: ', JSON.stringify(res));
         return Promise.resolve(res);
       });
   },

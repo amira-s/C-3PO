@@ -1,6 +1,5 @@
 const path = require("path");
 const express = require("express");
-const fetch = require("node-fetch"); 
 const app = express();
 const sendToStorage = require('./send-to-storage');
 const bodyParser = require('body-parser')
