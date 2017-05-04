@@ -214,9 +214,20 @@ app.post("/api/v1/conv", (req, res) => {
   //Unsafe AF
   let clientToken = req.body.clientToken;
   let convId = req.body.convId;
+  let date = req.body.date;
   new Storage("cloudantNoSQLDB", "conv", (db) => {
-    db.insert({clientToken, convId}, (err, data) => {
+    db.insert({clientToken, convId, Date}, (err, data) => {
       res.json({"res": "Ok"});
+    });
+  });
+});
+
+app.get("/api/v1/conv/:token", (req, res) => {
+  //Unsafe AF
+  let clientToken = req.params.token;
+  new Storage("cloudantNoSQLDB", "conv", (db) => {
+    db.find({selector:{clientToken}}, (er, result) => {
+      res.json(result);
     });
   });
 });
@@ -239,13 +250,17 @@ app.get("/api/v1/token/:org", (req, res) => {
   });
 });
 
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
 var getData = (result) => {
  var words = {};
  var mood = 0;
  for (var i = result.docs.length - 1; i >= 0; i--) {
   if (result.docs[i].watson[2] != undefined) {
     for (var y = result.docs[i].watson[2].keywords.length - 1; y >= 0; y--) {
-      let wrd = String(result.docs[i].watson[2].keywords[y].text);
+      let wrd = capitalizeFirstLetter(String(result.docs[i].watson[2].keywords[y].text));
       if (words[wrd] == undefined)
         words[wrd] = 1;
       else
