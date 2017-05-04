@@ -7,6 +7,7 @@ const watson = require('../watson-services');
 const isAuthenticated = (req) => true; //req.body.password === 'pass';
 const uuid = require('uuid/v4');
 const log = require('../utils/log');
+const omit = require('lodash/omit');
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -36,6 +37,34 @@ app.use("/api", (req, res, next) => {
 *  }
 */
 
+function sendToStorage({ message, response = { output: {}} } = {}) {
+  const data = {
+    ...message,
+    watson: [response],
+    output: { type: "text", text: response.output.text },
+  };
+
+  fetch('http://localhost:3001/api/v1/add-message',
+    {
+      method: 'POST',
+      headers: {'Content-Type': "application/json"},
+      body: JSON.stringify(data),
+    })
+    .then((res) => res.json())
+    .then((json) => {
+      log('[sendToStorage] /api/v1/add-message return:', json);
+      return Promise.resolve(json);
+    })
+    .catch(err => {
+      if (err.code === 'ECONNREFUSED') {
+        log(`[sendToStorage] Can't connect to storage API. Is server started ?`,
+          `"${err.message.replace(/^(.*), reason: /, '')}"`);
+      } else {
+        console.error('[sendToStorage] /api/v1/add-message failed:', err);
+      }
+    });
+}
+
 app.post("/api/v1/message", (req, res) => {
   const messageId = uuid();
   console.log(
@@ -54,39 +83,11 @@ app.post("/api/v1/message", (req, res) => {
       res.send("Watson isn't responding.");
     })
     .then((response) => {
-      delete req.body.context;
-      let data = {
-        ...req.body,
-        output: {type: "text", text: response.output.text},
-        watson: []
+      const message = {
+        ...omit(req.body, 'context'),
+        message_id: messageId,
       };
-      data.watson.push(response);
-
-      log("DATA FOR POST REQUEST TO STORAGE", data);
-
-      fetch('http://localhost:3001/api/v1/add-message',
-        {
-          method: 'POST',
-          headers: {'Content-Type': "application/json"},
-          body: JSON.stringify({
-            ...data,
-            message_id: messageId,
-          }),
-        })
-        .then((res) => {
-          return res.json();
-        }).then((json) => {
-          log('[/api/v1/message] /api/v1/add-message return:', json);
-        })
-        .catch(err => {
-          if (err.code === 'ECONNREFUSED') {
-            log(`[/api/v1/message] Can't connect to storage API. Is server started ?`,
-              `"${err.message.replace(/^(.*), reason: /, '')}"`);
-          } else {
-            console.error('[/api/v1/message] /api/v1/add-message failed:', err);
-          }
-
-        });
+      return sendToStorage({ message, response });
     });
 });
 
