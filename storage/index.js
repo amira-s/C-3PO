@@ -243,7 +243,7 @@ app.get("/api/v1/token/:org", (req, res) => {
         res.json({"error": "Org unknown"});
       else {
         new Storage("cloudantNoSQLDB", "client", (db) => {
-          let token = uuidV4();
+          let token = uuid();
           db.insert({orgName: result.docs[0].name, clientToken: token}, (err, data) => {
             res.json({token: token});
           });
