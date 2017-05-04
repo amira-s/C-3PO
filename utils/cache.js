@@ -56,30 +56,28 @@ class Cache {
     });
   }
   /**
-   * Try to access cached value with arguments `args` in namespace `msgId`. If
+   * Try to access cached value with arguments `args` in namespace `namespace`. If
    * none exists, call `getResult` with `args`, cache the result in Redis
    * database, and return the result.
-   * @param {string} msgId
+   * @param {string} namespace
    * @param {T} args
    * @param {(T) => string|Promise<string>} getResult
    */
-  access(msgId, args, getResult) {
+  access(namespace, args, getResult) {
     const key = hash(args);
 
     const setAndResolveResult = (result) => {
-      return this.redis.hset(msgId, key, result)
+      return this.redis.hset(namespace, key, result)
         .then(() => Promise.resolve(result.toString()));
     }
 
-    console.log(key);
-
-    return this.redis.hget(msgId, key)
+    return this.redis.hget(namespace, key)
       .then((cached) => {
         if (cached !== null) {
-          this.log(`Cache hit (${cached}).`);
+          this.log(`Cache hit [${namespace}] (${cached}).`);
           return Promise.resolve(cached);
         }
-        this.log(`Cache miss.`);
+        this.log(`Cache miss [${namespace}].`);
         const result = getResult(args);
         return (result instanceof Promise) ?
           result.then(setAndResolveResult) :
@@ -89,31 +87,32 @@ class Cache {
   /**
    * Like .access, but serialise JSON before storing it, and parse it before
    * returning it.
-   * @param {string} msgId
+   * @param {string} namespace
    * @param {*} args
    * @param {(*) => object|Promise<object>} getResult
    */
-  accessJson(msgId, args, getResult) {
+  accessJson(namespace, args, getResult) {
     const getResultStr = (...args) => {
       const result = getResult(...args);
       return result instanceof Promise ?
         result.then(stringify) :
         stringify(result);
     }
-    return this.access(msgId, args, getResultStr)
+    return this.access(namespace, args, getResultStr)
       .then(res => Promise.resolve(JSON.parse(res)));
   }
   /**
-   * Remove all Redis entries associated with namespace `msgId`.
+   * Remove all Redis entries associated with namespace `namespace`.
    */
-  clear(msgId) {
-    return this.redis.del(msgId);
+  clear(namespace) {
+    this.log(`Flushing cache for namespace "${namespace}"...`);
+    return this.redis.del(namespace);
   }
   /**
    * Wipe all entries in Redis database.
    */
   clearAll() {
-    console.log('[cache] Flushing Redis cache...');
+    this.log('Flushing Redis cache...');
     return this.redis.flushall();
   }
 }

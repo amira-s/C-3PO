@@ -3,7 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const watson = require('../watson-services');
 const Storage = require('./Storage.js');
-const uuidV4 = require('uuid/v4');
+const uuid = require('uuid/v4');
+const log = require('../utils/log');
 
 var isAuthenticated = (req, callback) => {
   var token = req.get("Authorization");
@@ -82,13 +83,20 @@ var tokenRequired = (req, res, next) => {
 *  }
 */
 app.post("/api/v1/add-message", (req, res) => {
-  console.log('----------------------------------------', new Date());
-  console.log(req.body);
+  console.log( '------------', 'time: [', new Date(), ']');
+  log('[/api/v1/add-message] body: ', req.body);
+
+  const messageId = req.body.message_id;
+  console.log('MESSAGEID:', messageId)
+
   let content = {
     ...req.body,
     id_session: "amira_s" + req.body.id_session,
-  }
+  };
+  delete content.message_id;
 
+//CONFLIT
+/*<<<<<<< HEAD
   watson.tone_analyzer(content.input.text)
   .then((response) => {
     console.log("tone_analyzer added");
@@ -100,20 +108,44 @@ app.post("/api/v1/add-message", (req, res) => {
   })
   .then(() => {
     return watson.nlu(content.input.text)
+=======
+  watson.tone_analyzer(content.input.text, messageId)
+>>>>>>> 03f428b054b26b0df3ffefc0a657886da207982a
     .then((response) => {
       console.log("natural language understanding added");
       console.log(JSON.stringify(response, null, 2));
       content.watson.push(response);
     })
     .catch((err) => {
+<<<<<<< HEAD
       console.log("NLU ===== ", err);
+=======
+      console.log("Tone analyzer ===== ", err);
+    })
+    .then(() => {
+      return watson.nlu(content.input.text, messageId)
+        .then((response) => {
+          console.log("natural language understanding added");
+          console.log(JSON.stringify(response, null, 2));
+          content.watson.push(response);
+        })
+        .catch((err) => {
+          console.log("NLU ===== ", err);
+        });
+    })
+    .then(() => {
+      watson.lastCall(messageId);
+      new Storage("cloudantNoSQLDB", "codecamp", (db) => {
+        db.insert(content, (err, data) => {res.json({"res": "Ok"});});
+      });
+>>>>>>> 03f428b054b26b0df3ffefc0a657886da207982a
     });
   })
   .then(() => {
     new Storage("cloudantNoSQLDB", "codecamp", (db) => {
       db.insert(content, (err, data) => {res.json({"res": "Ok"});});
     });      
-  });
+  });*/
 });
 
 /************ BACKOFFICE DB **********************/
@@ -143,7 +175,7 @@ app.post("/api/v1/token", (req, res) => {
           var id = result.docs[0]._id;
           db.find({selector:{_id: id}}, (er, result) => {
             if (result.docs.length <= 0) {
-              var token = uuidV4();
+              var token = uuid();
               db.insert({_id: id, token}, (err, data) => {
                 res.json({token});
               });
@@ -184,8 +216,8 @@ app.get("/api/v1/org", (req, res) => {
 app.post("/api/v1/org", (req, res) => {
   let name = req.body.name;
   let img = req.body.img
-  let adminToken = uuidV4();
-  let clientToken = uuidV4();
+  let adminToken = uuid();
+  let clientToken = uuid();
   new Storage("cloudantNoSQLDB", "org", (db) => {
     getUserId(req, (str) => {
       db.insert({clientToken, adminToken, name, img, owner: str}, (err, data) => {
