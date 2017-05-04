@@ -63,9 +63,9 @@ app.post("/api/v1/message", (req, res) => {
       data.watson.push(response);
 
       log("DATA FOR POST REQUEST TO STORAGE", data);
-      
+
       fetch('http://localhost:3001/api/v1/add-message', { 
-          method: 'POST', 
+          method: 'POST',
           headers: {'Content-Type': "application/json"},
         body: JSON.stringify({
           ...data,
@@ -77,7 +77,6 @@ app.post("/api/v1/message", (req, res) => {
         }).then(function(json) {
           log('[/api/v1/message] /api/v1/add-message return:', json);
         });
-      
     });
 });
 

@@ -87,7 +87,6 @@ app.post("/api/v1/add-message", (req, res) => {
   log('[/api/v1/add-message] body: ', req.body);
 
   const messageId = req.body.message_id;
-  console.log('MESSAGEID:', messageId)
 
   let content = {
     ...req.body,
@@ -95,31 +94,13 @@ app.post("/api/v1/add-message", (req, res) => {
   };
   delete content.message_id;
 
-//CONFLIT
-/*<<<<<<< HEAD
-  watson.tone_analyzer(content.input.text)
-  .then((response) => {
-    console.log("tone_analyzer added");
-    console.log(JSON.stringify(response, null, 2));
-    content.watson.push(response);
-  })
-  .catch((err) => {
-    console.log("Tone analyzer ===== ", err);
-  })
-  .then(() => {
-    return watson.nlu(content.input.text)
-=======
   watson.tone_analyzer(content.input.text, messageId)
->>>>>>> 03f428b054b26b0df3ffefc0a657886da207982a
     .then((response) => {
       console.log("natural language understanding added");
       console.log(JSON.stringify(response, null, 2));
       content.watson.push(response);
     })
     .catch((err) => {
-<<<<<<< HEAD
-      console.log("NLU ===== ", err);
-=======
       console.log("Tone analyzer ===== ", err);
     })
     .then(() => {
@@ -138,14 +119,7 @@ app.post("/api/v1/add-message", (req, res) => {
       new Storage("cloudantNoSQLDB", "codecamp", (db) => {
         db.insert(content, (err, data) => {res.json({"res": "Ok"});});
       });
->>>>>>> 03f428b054b26b0df3ffefc0a657886da207982a
     });
-  })
-  .then(() => {
-    new Storage("cloudantNoSQLDB", "codecamp", (db) => {
-      db.insert(content, (err, data) => {res.json({"res": "Ok"});});
-    });      
-  });*/
 });
 
 /************ BACKOFFICE DB **********************/
