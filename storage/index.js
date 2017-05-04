@@ -5,7 +5,7 @@ const uuid = require('uuid/v4');
 const log = require('../utils/log');
 const Storage = require('./Storage');
 
-const addMessageListener = require('./add-message')();
+app.post('/api/v1/add-message', require('./add-message'));
 
 var isAuthenticated = (req, callback) => {
   var token = req.get("Authorization");

@@ -19,7 +19,6 @@
     "reddis": "./binaries/redis-server"
   },
   "dependencies": {
-    "amqplib": "^0.5.1",
     "body-parser": "^1.16.1",
     "cfenv": "^1.0.x",
     "cloudant": "^1.7.1",

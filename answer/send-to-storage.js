@@ -1,4 +1,6 @@
-const { sendToQueue } = require('../broker');
+const fetch = require('node-fetch');
+
+const STORAGE_API_URL = 'http://localhost:3001';
 
 function sendToStorage({ message, response = { output: {}} } = {}) {
   const data = {
@@ -7,7 +9,13 @@ function sendToStorage({ message, response = { output: {}} } = {}) {
     output: { type: "text", text: response.output.text },
   };
 
-  sendToQueue('message-storage', JSON.stringify(data));
+  fetch(STORAGE_API_URL, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
 }
 
 module.exports = sendToStorage;

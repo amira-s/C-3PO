@@ -31,7 +31,6 @@ module.exports = class Storage {
       }
     }
 
-
   /* @content {
   *      "id_session": (string "chef_token"),
   *      "date": (timestamp),
