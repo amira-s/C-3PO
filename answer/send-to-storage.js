@@ -9,7 +9,7 @@ function sendToStorage({ message, response = { output: {}} } = {}) {
     output: { type: "text", text: response.output.text },
   };
 
-  fetch(STORAGE_API_URL, {
+  fetch(`${STORAGE_API_URL}/api/v1/add-message`, {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
