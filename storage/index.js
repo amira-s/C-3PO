@@ -222,6 +222,8 @@ app.post("/api/v1/conv", (req, res) => {
   new Storage("cloudantNoSQLDB", "conv", (db) => {
     db.insert({clientToken, convId, Date}, (err, data) => {
       res.json({"res": "Ok"});
+      console.log("REGISTERING CONV ID");
+      console.log("ERR ENCOUTERED ", err);
     });
   });
 });
@@ -257,9 +259,26 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+// TODO get nombre total de conversation
+// TODO get nombre total d'utilisateur
+// TODO get percentage of bad events, good events, average events
+// TODO ...
+
+//ONMOBILE need partie prenante + risque + impact per conv
+
 var getData = (result) => {
   var words = {};
   var mood = 0;
+  var category = "";
+
+  if (result.docs[1].watson[0].intents.length > 0) {
+    if (result.docs[1].watson[0].intents[0].intent == "good_mood")
+      mood = 1;
+    else if (result.docs[1].watson[0].intents[0].intent == "bad_mood")
+      mood = -1;
+  }
+  category = result.docs[3].input.text || "";
+  
   for (var i = result.docs.length - 1; i >= 0; i--) {
     if (result.docs[i].watson[2] != undefined) {
       for (var y = result.docs[i].watson[2].keywords.length - 1; y >= 0; y--) {
@@ -270,14 +289,8 @@ var getData = (result) => {
           words[wrd] += 1;
       }
     }
-    if (result.docs[i].watson[0].intents.length > 0) {
-      if (result.docs[i].watson[0].intents[0].intent == "good_mood")
-        mood = 1;
-      else if (result.docs[i].watson[0].intents[0].intent == "bad_mood")
-        mood = -1;
-    }
   }
-  return {mood, words};
+  return {mood, words, category};
 }
 
 app.get("/api/v1/stats/user/:session", (req, res) => {
