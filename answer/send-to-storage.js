@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-const STORAGE_API_URL = 'http://localhost:3001';
+const STORAGE_API_URL = 'http://localhost:3001/api/v1/add-message';
 
 function sendToStorage({ message, response = { output: {}} } = {}) {
   const data = {

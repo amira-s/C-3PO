@@ -5,7 +5,7 @@ const Storage = require('./Storage.js');
 module.exports = (req, res) => {
   let msg = req.body;
   console.log( '------------', 'time: [', new Date(), ']');
-
+  console.log(req);
   if (typeof msg !== 'object') {
     console.error('ERROR [add-message] Malformed message received: ', msg);
   }

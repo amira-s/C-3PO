@@ -118,6 +118,8 @@ app.post("/api/v1/add-message", (req, res) => {
     .then(() => {
       new Storage("cloudantNoSQLDB", "codecamp", (db) => {
         db.insert(content, (err, data) => {
+          console.log("--------INSERT ADD-MESSAGE---------");
+          console.log(content.stringify());
           if (err)
             console.log("ERRR", err);
           if (data)
@@ -269,16 +271,9 @@ function capitalizeFirstLetter(string) {
 var getData = (result) => {
   var words = {};
   var mood = 0;
-  var category = "";
+  var category = {};
+  var messages = result.docs.length;
 
-  if (result.docs[1].watson[0].intents.length > 0) {
-    if (result.docs[1].watson[0].intents[0].intent == "good_mood")
-      mood = 1;
-    else if (result.docs[1].watson[0].intents[0].intent == "bad_mood")
-      mood = -1;
-  }
-  category = result.docs[3].input.text || "";
-  
   for (var i = result.docs.length - 1; i >= 0; i--) {
     if (result.docs[i].watson[2] != undefined) {
       for (var y = result.docs[i].watson[2].keywords.length - 1; y >= 0; y--) {
@@ -289,9 +284,23 @@ var getData = (result) => {
           words[wrd] += 1;
       }
     }
+    if (result.docs[i].watson[0].intents.length > 0) {
+      if (result.docs[i].watson[0].intents[0].intent == "good_mood")
+        mood = 1;
+      else if (result.docs[i].watson[0].intents[0].intent == "bad_mood")
+        mood = -1;
+    }
+    if (i === 3)
+    {
+      if (category[result.docs[i].input.text] === undefined)
+        category[result.docs[i].input.text] = 1;
+      else
+        category[result.docs[i].input.text] += 1;
+    }
   }
-  return {mood, words, category};
+  return {mood, words, category, messages};
 }
+
 
 app.get("/api/v1/stats/user/:session", (req, res) => {
   let id_session = req.params.session;
