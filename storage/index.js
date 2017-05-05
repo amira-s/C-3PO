@@ -5,8 +5,6 @@ const uuid = require('uuid/v4');
 const log = require('../utils/log');
 const Storage = require('./Storage');
 
-app.post('/api/v1/add-message', require('./add-message'));
-
 var isAuthenticated = (req, callback) => {
   var token = req.get("Authorization");
   new Storage("cloudantNoSQLDB", "token", (db) => {
@@ -35,6 +33,9 @@ var getUserId = (req, callback) => {
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.post('/api/v1/add-message', require('./add-message'));
+
 
 app.use(function(req, res, next) {
   console.log("----------------------REQ---");
