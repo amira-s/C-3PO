@@ -9,6 +9,9 @@ function sendToStorage({ message, response = { output: {}} } = {}) {
     output: { type: "text", text: response.output.text },
   };
 
+  console.log("sendToStorage -------------------- ");
+  console.log(data);
+
   fetch(STORAGE_API_URL, {
     method: 'POST',
     body: JSON.stringify(data),

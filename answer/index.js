@@ -59,6 +59,8 @@ app.post("/api/v1/message", (req, res) => {
         ...omit(req.body, 'context'),
         message_id: messageId,
       };
+      console.log("--------- message right befre sentostorage----------");
+      console.log(message);
       return sendToStorage({ message, response });
     });
 });
